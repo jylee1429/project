@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include <thread>
 
-#define QUEUE_SIZE 128
+#define QUEUE_SIZE 50
 
 using namespace std;
 
