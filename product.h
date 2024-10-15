@@ -6,41 +6,37 @@
 using namespace std;
 
 class Product {
-	string productID;																	// »óÇ° °íÀ¯ ¹øÈ£
-	string productName;																	// »óÇ°¸í
-	string productManufacturer;															// »óÇ° Á¦Á¶»ç
-	int productPrice;																	// »óÇ° ÆÇ¸Å °¡°İ
-	int salePrice;																		// ½ÇÁ¦ °è»êµÇ´Â °¡°İ
-	int productStock;																	// »óÇ° Àç°í
-	static bool isDiscounted;															// ÇÒÀÎ ¿©ºÎ
-	static float discountRatio;															// ÇÒÀÎ ºñÀ²
+	string productID;																	// ìƒí’ˆ ê³ ìœ  ë²ˆí˜¸
+	string productName;																	// ìƒí’ˆëª…
+	string productManufacturer;															// ìƒí’ˆ ì œì¡°ì‚¬
+	int productPrice;																	// ìƒí’ˆ ê°€ê²©
+	int discountPrice;																	// í• ì¸ëœ ê°€ê²©
+	int productStock;																	// ìƒí’ˆ ì¬ê³ 
+	bool isDiscounted;																	// í• ì¸ ì—¬ë¶€
 public:
-	// ÀÎÅÍÆäÀÌ½º ÇÔ¼ö
-	Product(void);																		// »ı¼ºÀÚ
-	string getProductID(void) const;													// »óÇ° ¹øÈ£ Ãâ·Â
-	void setProductID(void);															// »óÇ° ¹øÈ£ ¼³Á¤
-	int getProductPrice(void) const;													// »óÇ° °¡°İ Ãâ·Â
-	void setProductPrice(int price);													// »óÇ° °¡°İ ¼³Á¤
-	int getProductStock(void) const;													// »óÇ° Àç°í Ãâ·Â
-	void setProductStock(int stock);													// »óÇ° Àç°í ¼³Á¤
-	string getProductName(void) const;													// »óÇ°¸í Ãâ·Â
-	void setProductName(string& name);													// »óÇ°¸í ¼³Á¤
-	string getProductManufacturer(void) const;											// »óÇ° Á¦Á¶»ç Ãâ·Â
-	void setProductManufacturer(string& manufacturer);									// »óÇ° Á¦Á¶»ç ¼³Á¤
-	void setSalePrice(void);															// ÆÇ¸ÅµÇ´Â °¡°İ ¼³Á¤
-	int getSalePrice(void) const;														// ÆÇ¸ÅµÇ´Â °¡°İ ¼³Á¤			
-	static void setDiscountRatio(float ratio);											// ÇÒÀÎ ºñÀ² ¼³Á¤
-	static float getDiscountRatio(void);												// ÇÒÀÎ ºñÀ² Ãâ·Â			
-	static void setDiscount(bool discount);												// ÇÒÀÎ ¿©ºÎ ¼³Á¤
-	static bool getDiscount(void);														// ÇÒÀÎ ¿©ºÎ Ãâ·Â
+	// ì¸í„°í˜ì´ìŠ¤ í•¨ìˆ˜
+	Product(string name, string manufacture, int price, int stock);						// ìƒì„±ì
+	string getProductID(void) const;													// ìƒí’ˆ ë²ˆí˜¸ ì¶œë ¥
+	void setProductID(void);															// ìƒí’ˆ ë²ˆí˜¸ ì„¤ì •
+	int getProductPrice(void) const;													// ìƒí’ˆ ê°€ê²© ì¶œë ¥
+	void setProductPrice(int price);													// ìƒí’ˆ ê°€ê²© ì„¤ì •
+	int getProductStock(void) const;													// ìƒí’ˆ ì¬ê³  ì¶œë ¥
+	void setProductStock(int stock);													// ìƒí’ˆ ì¬ê³  ì„¤ì •
+	string getProductName(void) const;													// ìƒí’ˆëª… ì¶œë ¥
+	void setProductName(string name);													// ìƒí’ˆëª… ì„¤ì •
+	string getProductManufacturer(void) const;											// ìƒí’ˆ ì œì¡°ì‚¬ ì¶œë ¥
+	void setProductManufacturer(string manufacturer);									// ìƒí’ˆ ì œì¡°ì‚¬ ì„¤ì •
+	void setDiscount(bool discount);													// í• ì¸ ì—¬ë¶€ ì„¤ì •
+	bool getDiscount(void) const;														// í• ì¸ ì—¬ë¶€ ì¶œë ¥
+	void changeProductPrice(tm salesStart, tm salesEnd);								// ì„¸ì¼ ê¸°ê°„ ì¤‘ í• ì¸ ê°€ê²© ì„¤ì •
+	void setDiscountPrice(float ratio);													// í• ì¸ëœ ê°€ê²© ì„¤ì •
 
-	// »óÇ° °ü¸® ÇÔ¼ö
-	static void checkDisCountDay(tm salesStart, tm salesEnd);							// ¼¼ÀÏ ±â°£ Áß ÇÒÀÎ °¡°İ ¼³Á¤
-	static void addProductStock(string id, int cnt);									// »óÇ° °¹¼ö Ãß°¡
-	static void subProductStock(string id, int cnt);									// »óÇ° °¹¼ö Â÷°¨
-	static bool registerProduct(string name, string manufacture, int price, int stock);	// µ¥ÀÌÅÍ º£ÀÌ½º¿¡ »óÇ° µî·Ï
-	static bool deleteProduct(string id);												// µ¥ÀÌÅÍ º£ÀÌ½º¿¡¼­ »óÇ° »èÁ¦
-	static bool checkProductExist(string id);											// »óÇ° µ¥ÀÌÅÍ º£ÀÌ½º¿¡ ÇØ´çÇÏ´Â Á¦Ç°ÀÌ ÀÖ´ÂÁö È®ÀÎ
+	// ìƒí’ˆ ê´€ë¦¬ í•¨ìˆ˜
+	static void addProductStock(string id, int cnt);									// ìƒí’ˆ ê°¯ìˆ˜ ì¶”ê°€
+	static void subProductStock(string id, int cnt);									// ìƒí’ˆ ê°¯ìˆ˜ ì°¨ê°
+	static bool registerProduct(string name, string manufacture, int price, int stock);	// ë°ì´í„° ë² ì´ìŠ¤ì— ìƒí’ˆ ë“±ë¡
+	static bool deleteProduct(string id);												// ë°ì´í„° ë² ì´ìŠ¤ì—ì„œ ìƒí’ˆ ì‚­ì œ
+	static bool checkProductExist(string id);											// ìƒí’ˆ ë°ì´í„° ë² ì´ìŠ¤ì— í•´ë‹¹í•˜ëŠ” ì œí’ˆì´ ìˆëŠ”ì§€ í™•ì¸
 };
 
 #endif 

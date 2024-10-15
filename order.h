@@ -7,60 +7,58 @@
 #include "user.h"
 
 class Order {	
-	map<string, int> orderList;								// ÁÖ¹®ÇÑ Á¦Ç° ¸ñ·Ï(»óÇ° ID, ÁÖ¹® °³¼ö)
-	int totalPrice;											// ÃÑ ÁÖ¹® ±İ¾×
-	string orderAddress;									// ¹è¼ÛÇÒ ÁÖ¼Ò
-	string orderState;										// ÁÖ¹® »óÅÂ
-	bool isMember;											// È¸¿ø / ºñÈ¸¿ø ¿©ºÎ
+	map<string, int> orderList;								// ì£¼ë¬¸í•œ ì œí’ˆ ëª©ë¡(ìƒí’ˆ ID, ì£¼ë¬¸ ê°œìˆ˜)
+	int totalPrice;											// ì´ ì£¼ë¬¸ ê¸ˆì•¡
+	string orderAddress;									// ë°°ì†¡í•  ì£¼ì†Œ
+	string orderState;										// ì£¼ë¬¸ ìƒíƒœ
+	bool isMember;											// íšŒì› / ë¹„íšŒì› ì—¬ë¶€
 protected:
-	string orderID;											// ÁÖ¹®¹øÈ£
+	string orderID;											// ì£¼ë¬¸ë²ˆí˜¸
 public:
-	Order(void);											// »ı¼ºÀÚ
-	virtual void transmitOrder(void) = 0;					// server·Î ÁÖ¹® ½ÅÃ»
-	virtual void handleOrder(void) = 0;						// server¿¡¼­ ÁÖ¹® Ã³¸®
-	void setOrderState(string& state);						// ¹è¼Û »óÅÂ ¼³Á¤
-	string getOrderState(void) const;						// ¹è¼Û »óÅÂ Ãâ·Â
-	virtual void setOrderID(void) = 0;						// ÁÖ¹® ¹øÈ£ ¼³Á¤
-	string getOrderID(void) const;							// ÁÖ¹® ¹øÈ£ Ãâ·Â
-	void addTotalPrice(int price);							// ÃÑ ÁÖ¹® ±İ¾×¿¡¼­ ±İ¾× Ãß°¡
-	void subTotalPrice(int price);							// ÃÑ ÁÖ¹® ±İ¾×¿¡¼­ ±İ¾× Â÷°¨
-	int getTotalPrice(void) const;							// ÃÑ ÁÖ¹® ±İ¾× Ãâ·Â
-	void setOrderAddress(string& address);					// ¹è¼Û ÁÖ¼Ò ¼³Á¤
-	string getOrderAddress(void) const;						// ¹è¼Û ÁÖ¼Ò Ãâ·Â
-	virtual bool checkMileageUsed(void) = 0;				// ¸¶ÀÏ¸®Áö »ç¿ë ¿©ºÎ
-	void addQuantity(Product& product, int orderQuantity);	// Àå¹Ù±¸´Ï¿¡ ¹°°Ç Ãß°¡
-	void subQuantity(Product& product);						// Àå¹Ù±¸´Ï¿¡ ¹°°Ç Á¦°Å
-	void makeRandomNumber(stringstream& id);				// orderID¿¡ ³ÖÀ» ·£´ı ¼ıÀÚ »ı¼º
-	virtual ~Order(void) = default;							// ¼Ò¸êÀÚ
+	Order(void);											// ìƒì„±ì
+	virtual void transmitOrder(void) = 0;					// serverë¡œ ì£¼ë¬¸ ì‹ ì²­
+	virtual void handleOrder(void) = 0;						// serverì—ì„œ ì£¼ë¬¸ ì²˜ë¦¬
+	void setOrderState(string& state);						// ë°°ì†¡ ìƒíƒœ ì„¤ì •
+	string getOrderState(void) const;						// ë°°ì†¡ ìƒíƒœ ì¶œë ¥
+	virtual void setOrderID(void) = 0;						// ì£¼ë¬¸ ë²ˆí˜¸ ì„¤ì •
+	string getOrderID(void) const;							// ì£¼ë¬¸ ë²ˆí˜¸ ì¶œë ¥
+	void addTotalPrice(int price);							// ì´ ì£¼ë¬¸ ê¸ˆì•¡ì—ì„œ ê¸ˆì•¡ ì¶”ê°€
+	void subTotalPrice(int price);							// ì´ ì£¼ë¬¸ ê¸ˆì•¡ì—ì„œ ê¸ˆì•¡ ì°¨ê°
+	int getTotalPrice(void) const;							// ì´ ì£¼ë¬¸ ê¸ˆì•¡ ì¶œë ¥
+	void setOrderAddress(string& address);					// ë°°ì†¡ ì£¼ì†Œ ì„¤ì •
+	string getOrderAddress(void) const;						// ë°°ì†¡ ì£¼ì†Œ ì¶œë ¥
+	virtual bool checkMileageUsed(void) = 0;				// ë§ˆì¼ë¦¬ì§€ ì‚¬ìš© ì—¬ë¶€
+	void addQuantity(Product& product, int orderQuantity);	// ì¥ë°”êµ¬ë‹ˆì— ë¬¼ê±´ ì¶”ê°€
+	void subQuantity(Product& product);						// ì¥ë°”êµ¬ë‹ˆì— ë¬¼ê±´ ì œê±°
+	void makeRandomNumber(stringstream& id);				// orderIDì— ë„£ì„ ëœë¤ ìˆ«ì ìƒì„±
+	virtual ~Order(void) = default;							// ì†Œë©¸ì
 };
 
-// È¸¿ø ÁÖ¹®
+// íšŒì› ì£¼ë¬¸
 class OrderMember : public Order {
-	Member orderMember;										// ÁÖ¹®ÇÑ È¸¿ø Á¤º¸
-	bool isMileageUsed;										// ¸¶ÀÏ¸®Áö »ç¿ë ¿©ºÎ
+	Member orderMember;										// ì£¼ë¬¸í•œ íšŒì› ì •ë³´
+	bool isMileageUsed;										// ë§ˆì¼ë¦¬ì§€ ì‚¬ìš© ì—¬ë¶€
 public:
-	OrderMember();											// »ı¼ºÀÚ
-	void setMemInfo(Member& member);						// ÁÖ¹®ÇÑ È¸¿ø Á¤º¸ ¼³Á¤
-	Member getMemInfo(void) const;							// ÁÖ¹®ÇÑ È¸¿ø Á¤º¸ Ãâ·Â
+	OrderMember();											// ìƒì„±ì
+	void setMemInfo(Member& member);						// ì£¼ë¬¸í•œ íšŒì› ì •ë³´ ì„¤ì •
+	Member getMemInfo(void) const;							// ì£¼ë¬¸í•œ íšŒì› ì •ë³´ ì¶œë ¥
 	void transmitOrder(void) override;								
 	void handleOrder(void) override;		
 	void setOrderID(void) override;
-	bool getMileageUsed(void) const;						// ¸¶ÀÏ¸®Áö »ç¿ë¿©ºÎ Ãâ·Â(¸¶ÀÏ¸®Áö »ç¿ë ½Ã ¸ÅÃâ X)
-	void setMileageUsed(bool option);						// ¸¶ÀÏ¸®Áö »ç¿ë¿©ºÎ ¼³Á¤
-	~OrderMember(void) = default;
+	bool getMileageUsed(void) const;						// ë§ˆì¼ë¦¬ì§€ ì‚¬ìš©ì—¬ë¶€ ì¶œë ¥(ë§ˆì¼ë¦¬ì§€ ì‚¬ìš© ì‹œ ë§¤ì¶œ X)
+	void setMileageUsed(bool option);						// ë§ˆì¼ë¦¬ì§€ ì‚¬ìš©ì—¬ë¶€ ì„¤ì •
 };
 
-// ºñÈ¸¿ø ÁÖ¹®
+// ë¹„íšŒì› ì£¼ë¬¸
 class OrderGuest : public Order {
-	Guest orderGuest;										// ÁÖ¹®ÇÑ ºñÈ¸¿ø Á¤º¸
+	Guest orderGuest;										// ì£¼ë¬¸í•œ ë¹„íšŒì› ì •ë³´
 public:
 	OrderGuest();
-	void setMemInfo(Guest& guest);							// ÁÖ¹®ÇÑ ºñÈ¸¿ø Á¤º¸ ¼³Á¤	
-	Guest getMemInfo(void) const;							// ÁÖ¹®ÇÑ ºñÈ¸¿ø Á¤º¸ Ãâ·Â
+	void setMemInfo(Guest& guest);							// ì£¼ë¬¸í•œ ë¹„íšŒì› ì •ë³´ ì„¤ì •	
+	Guest getMemInfo(void) const;							// ì£¼ë¬¸í•œ ë¹„íšŒì› ì •ë³´ ì¶œë ¥
 	void transmitOrder(void) override;
 	void handleOrder(void) override;
 	void setOrderID(void) override;
-	~OrderGuest(void) = default;
 };
 
 #endif

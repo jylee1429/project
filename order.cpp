@@ -47,23 +47,23 @@ void Order::addQuantity(Product& product, int orderQuantity) {
 	int currentStock = product.getProductStock();
 	int actualAddCount = 0;
 
-	// Àå¹Ù±¸´Ï¿¡ ÀÖ´Â ¹°°ÇÀÎ °æ¿ì cnt¸¸Å­ °³¼ö Áõ°¡
+	// ì¥ë°”êµ¬ë‹ˆì— ìˆëŠ” ë¬¼ê±´ì¸ ê²½ìš° cntë§Œí¼ ê°œìˆ˜ ì¦ê°€
 	if (orderList.find(product.getProductID()) != orderList.end()) {
 		orderList[productID] += orderQuantity;
-		// ÁÖ¹®ÇÏ·Á´Â ¼ö·®ÀÌ Àç°í¸¦ ³ÑÁö ¾Êµµ·Ï Á¶Á¤
+		// ì£¼ë¬¸í•˜ë ¤ëŠ” ìˆ˜ëŸ‰ì´ ì¬ê³ ë¥¼ ë„˜ì§€ ì•Šë„ë¡ ì¡°ì •
 		if (orderList[productID] > currentStock) {
-			// ½ÇÁ¦·Î Ãß°¡µÈ ¼ö·®
+			// ì‹¤ì œë¡œ ì¶”ê°€ëœ ìˆ˜ëŸ‰
 			actualAddCount = orderList[productID] - currentStock;
 			orderList[productID] = currentStock;
 		}
 	}
-	// Àå¹Ù±¸´Ï¿¡ ¾ø´Â ¹°°ÇÀÎ °æ¿ì
+	// ì¥ë°”êµ¬ë‹ˆì— ì—†ëŠ” ë¬¼ê±´ì¸ ê²½ìš°
 	else {
-		// ÁÖ¹®ÇÏ·Á´Â ¼ö·®ÀÌ Àç°í¸¦ ³ÑÁö ¾Êµµ·Ï Á¶Á¤
+		// ì£¼ë¬¸í•˜ë ¤ëŠ” ìˆ˜ëŸ‰ì´ ì¬ê³ ë¥¼ ë„˜ì§€ ì•Šë„ë¡ ì¡°ì •
 		if (orderQuantity > currentStock) {
 			orderQuantity = currentStock;
 		}
-		// ½ÇÁ¦·Î Ãß°¡µÈ ¼ö·®
+		// ì‹¤ì œë¡œ ì¶”ê°€ëœ ìˆ˜ëŸ‰
 		actualAddCount = orderQuantity;
 		orderList.insert(make_pair(product.getProductID(), orderQuantity));
 	}
@@ -83,18 +83,18 @@ void Order::subQuantity(Product& product) {
 void Order::makeRandomNumber(stringstream& id) {
 	random_device rd;
 
-	// °íÀ¯ÇÑ ½Ã°£ °ª Ãß°¡
+	// ê³ ìœ í•œ ì‹œê°„ ê°’ ì¶”ê°€
 	time_t t = time(nullptr);
 	id << t;
-	// Áßº¹ ¹æÁö¸¦ À§ÇÑ ·£´ıÇÑ ¼ıÀÚ Ãß°¡
-	mt19937 gen(rd());									// random¶óÀÌºê·¯¸®¿¡¼­ Á¦°øÇÏ´Â ³­¼ö »ı¼º ¿£Áø
-	uniform_int_distribution<int> dis(0, 9999);			// ¹üÀ§ ¼³Á¤
-	int randomNum = dis(gen);							// ³­¼ö »ı¼º
-	id << setfill('0') << setw(4) << randomNum;			// ³­¼ö¸¦ 4ÀÚ¸®·Î °íÁ¤;
+	// ì¤‘ë³µ ë°©ì§€ë¥¼ ìœ„í•œ ëœë¤í•œ ìˆ«ì ì¶”ê°€
+	mt19937 gen(rd());									// randomë¼ì´ë¸ŒëŸ¬ë¦¬ì—ì„œ ì œê³µí•˜ëŠ” ë‚œìˆ˜ ìƒì„± ì—”ì§„
+	uniform_int_distribution<int> dis(0, 9999);			// ë²”ìœ„ ì„¤ì •
+	int randomNum = dis(gen);							// ë‚œìˆ˜ ìƒì„±
+	id << setfill('0') << setw(4) << randomNum;			// ë‚œìˆ˜ë¥¼ 4ìë¦¬ë¡œ ê³ ì •;
 }
 
-OrderMember::OrderMember() : Order(), orderMember(/* ÃÊ±âÈ­ ÀÎÀÚ */), isMileageUsed(false) {
-	// orderID »ı¼º
+OrderMember::OrderMember() : Order(), orderMember(/* ì´ˆê¸°í™” ì¸ì */), isMileageUsed(false) {
+	// orderID ìƒì„±
 	setOrderID();
 }
 
@@ -107,21 +107,21 @@ Member OrderMember::getMemInfo(void) const {
 }
 
 void OrderMember::transmitOrder(void) {
-	// TCP Åë½ÅÀ» ±â¹İÀ¸·Î client¿¡¼­ server·Î Àü¼Û
-	// Order°´Ã¼¸¦ Àü¼Û
+	// TCP í†µì‹ ì„ ê¸°ë°˜ìœ¼ë¡œ clientì—ì„œ serverë¡œ ì „ì†¡
+	// Orderê°ì²´ë¥¼ ì „ì†¡
 }
 
 void OrderMember::handleOrder(void) {
-	// server¿¡¼­ client¿¡°Ô ¹ŞÀº Order°´Ã¼¸¦ ¹ŞÀ½
-	// ¹ŞÀº order°´Ã¼¸¦ µ¥ÀÌÅÍº£ÀÌ½º¿¡ ÀúÀå
-	// ¸¶ÀÏ¸®Áö »ç¿ë¿©ºÎ È®ÀÎ
-	// ÁÖ¹® ÁøÇà »óÈ² È®ÀÎÇØ¼­ Ã³¸®
+	// serverì—ì„œ clientì—ê²Œ ë°›ì€ Orderê°ì²´ë¥¼ ë°›ìŒ
+	// ë°›ì€ orderê°ì²´ë¥¼ ë°ì´í„°ë² ì´ìŠ¤ì— ì €ì¥
+	// ë§ˆì¼ë¦¬ì§€ ì‚¬ìš©ì—¬ë¶€ í™•ì¸
+	// ì£¼ë¬¸ ì§„í–‰ ìƒí™© í™•ì¸í•´ì„œ ì²˜ë¦¬
 }
 
 void OrderMember::setOrderID(void) {
 	stringstream id;
 
-	// È¸¿øÀÇ °æ¿ì ÁÖ¹®¹øÈ£ ¸Ç ¾Õ¿¡ MÀ» Ãß°¡
+	// íšŒì›ì˜ ê²½ìš° ì£¼ë¬¸ë²ˆí˜¸ ë§¨ ì•ì— Mì„ ì¶”ê°€
 	id << 'M';
 	makeRandomNumber(id);
 
@@ -136,8 +136,8 @@ void OrderMember::setMileageUsed(bool option) {
 	isMileageUsed = option;
 }
 
-OrderGuest::OrderGuest() : Order(), orderGuest(/* ÃÊ±âÈ­ ÀÎÀÚ */) {
-	// orderID »ı¼º
+OrderGuest::OrderGuest() : Order(), orderGuest(/* ì´ˆê¸°í™” ì¸ì */) {
+	// orderID ìƒì„±
 	setOrderID();
 }
 
@@ -159,8 +159,9 @@ void OrderGuest::handleOrder(void) {
 
 void OrderGuest::setOrderID(void) {
 	stringstream id;
+	random_device rd;
 
-	// ºñÈ¸¿øÀÇ °æ¿ì ÁÖ¹®¹øÈ£ ¸Ç ¾Õ¿¡ GÀ» Ãß°¡
+	// ë¹„íšŒì›ì˜ ê²½ìš° ì£¼ë¬¸ë²ˆí˜¸ ë§¨ ì•ì— Gì„ ì¶”ê°€
 	id << 'G';
 	makeRandomNumber(id);
 

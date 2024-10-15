@@ -1,61 +1,85 @@
 #ifndef _USER_H_
 #define _USER_H_
 
+#include <iostream>
 #include <string>
+#include <cstdlib>
+#include <unordered_set>
+#include <memory>
+#include <vector>
+#include <unordered_map>
+#include <sqlite3.h>
 
 using namespace std;
 
-// »ç¿ëÀÚ
+// ì‚¬ìš©ì
 class User {
-	int userID;						    // »ç¿ëÀÚ °íÀ¯ ¹øÈ£
-	string userName;					// »ç¿ëÀÚ ÀÌ¸§
-	string userAddress;					// »ç¿ëÀÚ ÁÖ¼Ò
-	string userPhoneNumber;				// »ç¿ëÀÚ ¿¬¶ôÃ³
+	int userID;						    // ì‚¬ìš©ì ê³ ìœ  ë²ˆí˜¸
+	string userName;					// ì‚¬ìš©ì ì´ë¦„
+	string userAddress;					// ì‚¬ìš©ì ì£¼ì†Œ
+	string userPhoneNumber;				// ì‚¬ìš©ì ì—°ë½ì²˜
 public:
-	// »ç¿ëÀÚ °íÀ¯¹øÈ£ ¼³Á¤(·£´ı ¼³Á¤, Áßº¹ X)
-	// »ç¿ëÀÚ ÀÌ¸§ ¼³Á¤
-	// »ç¿ëÀÚ ÁÖ¼Ò ¼³Á¤
-	// »ç¿ëÀÚ ¿¬¶ôÃ³ ¼³Á¤
+	// ì‚¬ìš©ì ê³ ìœ ë²ˆí˜¸ ì„¤ì •(ëœë¤ ì„¤ì •, ì¤‘ë³µ X)
+	// ì‚¬ìš©ì ì´ë¦„ ì„¤ì •
+	// ì‚¬ìš©ì ì£¼ì†Œ ì„¤ì •
+	// ì‚¬ìš©ì ì—°ë½ì²˜ ì„¤ì •
 };
 
-// È¸¿ø
+// íšŒì›
 class Member : public User {
-	int memberID;						// È¸¿ø ID
-	int memberPW;						// È¸¿ø PassWord
-	int mileage;						// È¸¿ø ¸¶ÀÏ¸®Áö
-	int rating;							// È¸¿ø µî±Ş
+	int memberID;						// íšŒì› ID
+	int memberPW;						// íšŒì› PassWord
+	int mileage;						// íšŒì› ë§ˆì¼ë¦¬ì§€
+	int rating;							// íšŒì› ë“±ê¸‰   (ë¸Œë¡ ì¦ˆ/ì‹¤ë²„/ê³¨ë“œ/í”Œë ˆí‹°ë„˜)
 public:
-	// È¸¿ø ID ¼³Á¤
-	// È¸¿ø ºñ¹Ğ¹øÈ£ ¼³Á¤
-	// È¸¿ø ¸¶ÀÏ¸®Áö °ü¸®
-	// È¸¿ø µî±Ş °ü¸®
+	// íšŒì› ID ì„¤ì •
+	// íšŒì› ë¹„ë°€ë²ˆí˜¸ ì„¤ì •
+	// íšŒì› ë§ˆì¼ë¦¬ì§€ ê´€ë¦¬
+	// íšŒì› ë“±ê¸‰ ê´€ë¦¬
+	// íšŒì› ì •ë³´ ì…ë ¥
+	void setMemberInfo(Member& memberInfo);
 };
 
-// ºñÈ¸¿ø
+// ë¹„íšŒì›
 class Guest : public User {
-	int guestPW;						// ºñÈ¸¿ø ºñ¹Ğ¹øÈ£
+	int guestPW;						// ë¹„íšŒì› ë¹„ë°€ë²ˆí˜¸
 public:
-	// ºñÈ¸¿ø ºñ¹Ğ¹øÈ£ ¼³Á¤
+    Guest(string name, string address, int phoneNum, string pw, unordered_set<int>& usedNum)
+        : User(name, address, phoneNum), guestPW(pw) {
+        userID = "g" + to_string(randomNum(usedNum)); // userIDì— 'g' + ìˆ«ì
+    }
+	// ë¹„íšŒì› ë¹„ë°€ë²ˆí˜¸ ì„¤ì •
 };
 
-// °ü¸®ÀÚ
+// ê´€ë¦¬ì
 class Admin : public User {
-	int adminID;						// °ü¸®ÀÚ ID
-	int adminPW;						// °ü¸®ÀÚ ºñ¹Ğ¹øÈ£
+	int adminID;						// ê´€ë¦¬ì ID
+	int adminPW;						// ê´€ë¦¬ì ë¹„ë°€ë²ˆí˜¸
 public:
-	// »óÇ° Ãß°¡
-	// »óÇ° ÀÔ°í
-	// »óÇ° »èÁ¦
-	// »óÇ° °Ë»ö
-	// ÇÒÀÎ ±â°£ ¼³Á¤
-	// Á¦Ç° Á¤º¸ ¸ñ·Ï º¸±â
-	// ¸ÅÃâ ±İ¾× Á¶È¸
-	// È¸¿ø Á¤º¸ ¼öÁ¤
+	Admin(int id, int pw) : adminID(id), adminPW(pw) {}
+	void initDB(void);																				// ë°ì´í„° ë² ì´ìŠ¤ ì´ˆê¸°í™”
+	void addProduct(const string& productName, const string& manufacturer, int price, int stock);	// ìƒí’ˆ ì¶”ê°€
+	void modifyStock(int productID, int newStock);													// ìƒí’ˆ ì¬ê³  ìˆ˜ì •
+	void deleteProduct(int productID);																// ìƒí’ˆ ì‚­ì œ
+	void listProducts() const;     																	// ìƒí’ˆ ê²€ìƒ‰
+	// í• ì¸ ê¸°ê°„ ì„¤ì •
+	// ì œí’ˆ ì •ë³´ ëª©ë¡ ë³´ê¸°
+	// ë§¤ì¶œ ê¸ˆì•¡ ì¡°íšŒ
+	// íšŒì› ì •ë³´ ìˆ˜ì •
+	void listMember() const;																		// íšŒì› ì¡°íšŒ
+	void modifyMemberRating(const string& userID, int newRating);									// íšŒì› rating ìˆ˜ì •
+	void closeDB();																					// ë°ì´í„° ë² ì´ìŠ¤ ì¢…ë£Œ
 };
 
-// È¸¿ø °¡ÀÔ
-// ·Î±×ÀÎ
-// ºñÈ¸¿ø ¼³Á¤
 
+// ëœë¤ ìˆ«ì ìƒì„±
+int randomNum(unordered_set<int>& usedNum) {
+    int number;
+    do {
+        number = rand() % 10000;
+    } while (usedNum.find(number) != usedNum.end());
+    usedNum.insert(number);
+    return number;
+}
 
 #endif
