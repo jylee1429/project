@@ -3,6 +3,7 @@
 
 Admin::Admin(int id, int pw) : adminID(id), adminPW(pw), db(nullptr) {}
 
+/*
 void Admin::initDB() {
     if (sqlite3_open("veda.db", &db)) {
         cerr << "Can't open database: " << sqlite3_errmsg(db) << endl;
@@ -41,7 +42,7 @@ void Admin::initDB() {
         sqlite3_free(errMsg);
     }
 }
-
+*/
 void Admin::addProduct(const string& productName, const string& manufacturer, int price, int stock) {
     string insertSQL = "INSERT INTO Products (ProductName, Manufacturer, Price, Stock) VALUES (?, ?, ?, ?);";
     sqlite3_stmt* stmt;
@@ -63,7 +64,7 @@ void Admin::addProduct(const string& productName, const string& manufacturer, in
     }
     sqlite3_finalize(stmt);
 }
-// »óÇ° Á¶È¸
+// ìƒí’ˆ ì¡°íšŒ
 void Admin ::listProducts() const {
     const char* selectSQL = "SELECT * FROM Products;";
     sqlite3_stmt* stmt;
@@ -86,7 +87,7 @@ void Admin ::listProducts() const {
     }
     sqlite3_finalize(stmt);
 }
-// »óÇ° »èÁ¦
+// ìƒí’ˆ ì‚­ì œ
 void Admin::deleteProduct(int productID) {
     const char* deleteSQL = "DELETE FROM Products WHERE ProductID = ?;";
     sqlite3_stmt* stmt;
@@ -107,7 +108,7 @@ void Admin::deleteProduct(int productID) {
 
     sqlite3_finalize(stmt);
 }
-//»óÇ° Àç°í ¼öÁ¤
+//ìƒí’ˆ ìž¬ê³  ìˆ˜ì •
 void Admin::modifyStock(int productID, int newStock) {
     const char* modifyStock = "UPDATE Products SET Stock = ? WHERE ProductID = ?;";
     sqlite3_stmt* stmt;
@@ -127,7 +128,7 @@ void Admin::modifyStock(int productID, int newStock) {
     }
     sqlite3_finalize(stmt);
 }
-// È¸¿ø Á¶È¸
+// íšŒì› ì¡°íšŒ
 void Admin::listMember() const {
     const char* selectSQL = "SELECT * FROM User;";
     sqlite3_stmt* stmt;
@@ -157,7 +158,7 @@ void Admin::listMember() const {
     sqlite3_finalize(stmt);
 }
 
-// È¸¿ø rating ¼öÁ¤
+// íšŒì› rating ìˆ˜ì •
 void Admin::modifyMemberRating(const string& userID, int newRating) {
     const char* modifySQL = "UPDATE User SET rating = ? WHERE userID = ?;";
     sqlite3_stmt* stmt;
