@@ -15,7 +15,7 @@ private:
 
 public:
     Admin(int id, int pw);
-    void initDB();
+    //void initDB();
     void addProduct(const string& productName, const string& manufacturer, int price, int stock);
     void listProducts() const;
     void deleteProduct(int productID);
