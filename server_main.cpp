@@ -5,16 +5,25 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <thread>
+#include <mutex>
+#include <sqlite3.h>
+
 
 #define QUEUE_SIZE 50
 #define BUFFER_SIZE 1024
 
 using namespace std;
 using json = nlohmann::json;
+mutex mtx;
 
 void clientHandler(int serverSocket);
+void initDB();
+void handleLogInUser(int clientSocket, const string& id, const string& passwd);
+void handleRegisterClient(int clientSocket, const string& memberId, const string& memberName, const string& memberAddress, const string& memberPhoneNumber, const string& id, const string& passwd);
 
 int main(int argc, char* argv[]) {
+    initDB();  // 데이터베이스 초기화
+    
     int serverSocket;
     struct sockaddr_in serverAddr, clientAddr;
     socklen_t clientLen = sizeof(clientAddr);
@@ -119,31 +128,49 @@ void clientHandler(int clientSocket) {
         }
     }
 }
-
-void handleLogInUser(int clientSocket, const string& id, const string& password) {
+// 로그인 처리 함수
+void handleLogInUser(int clientSocket, const string& id, const string& passwd) {
     bool isExistUser = false;
 
-    /*
-    데이터 베이스 이용해서 해당 데이터가 있는지 확인
-    있으면 isExistUser = true;
-    없으면 isExistUser = false;
-    */
+    
+    mtx.lock();
+    string loginSQL = "SELECT COUNT(*) FROM User WHERE id = ? AND passwd = ?;";
+    sqlite3_stmt* stmt;
 
-    // 로그인 결과를 JSON 형식으로 생성
+    if (sqlite3_prepare_v2(db, loginSQL.c_str(), -1, &stmt, 0) == SQLITE_OK) {
+       
+        sqlite3_bind_text(stmt, 1, id.c_str(), -1, SQLITE_STATIC);
+        sqlite3_bind_text(stmt, 2, passwd.c_str(), -1, SQLITE_STATIC);
+
+        if (sqlite3_step(stmt) == SQLITE_ROW) {
+            int count = sqlite3_column_int(stmt, 0);
+            if (count > 0) {
+                isExistUser = true;
+            }
+        }
+        else {
+            cerr << "SQL execution failed: " << sqlite3_errmsg(db) << endl;
+        }
+    }
+    else {
+        cerr << "SQL preparation failed: " << sqlite3_errmsg(db) << endl;
+    }
+
+    sqlite3_finalize(stmt);
+    mtx.unlock();
+
+    
     json response;
-
     if (isExistUser) {
         response["status"] = "SUCCESS";
-    } 
+    }
     else {
         response["status"] = "FAIL";
     }
 
-    // JSON 응답 메시지를 문자열로 직렬화하여 전송
     string logInData = response.dump();
     if (send(clientSocket, logInData.c_str(), logInData.size(), 0) == -1) {
         perror("send");
-        return false;
     }
 }
 
@@ -151,16 +178,35 @@ void handleLogInUser(int clientSocket, const string& id, const string& password)
 void handleRegisterClient(int clientSocket, const string& memberId, const string& memberName, const string& memberAddress, const string& memberPhoneNumber, const string& id, const string& passwd) {
     bool isRegisterUser = false;
 
-    /*
-    데이터베이스를 이용하여 회원 정보를 저장하고 등록 성공 여부를 isRegisterUser에 설정
-    ranking = bronze, 마일리지 = 0으로 초기화
-    */
+    
+    mtx.lock();
+    string insertSQL = "INSERT INTO User (memberId, memberName, memberAddress, memberPhoneNumber, id, passwd, mileage, rating) VALUES (?, ?, ?, ?, ?, ?, 0, 1);";  // mileage = 0, rating = bronze(1)
+    sqlite3_stmt* stmt;
+    if (sqlite3_prepare_v2(db, insertSQL.c_str(), -1, &stmt, 0) == SQLITE_OK) {
+        sqlite3_bind_text(stmt, 1, memberId.c_str(), -1, SQLITE_STATIC);
+        sqlite3_bind_text(stmt, 2, memberName.c_str(), -1, SQLITE_STATIC);
+        sqlite3_bind_text(stmt, 3, memberAddress.c_str(), -1, SQLITE_STATIC);
+        sqlite3_bind_text(stmt, 4, memberPhoneNumber.c_str(), -1, SQLITE_STATIC);
+        sqlite3_bind_text(stmt, 5, id.c_str(), -1, SQLITE_STATIC);
+        sqlite3_bind_text(stmt, 6, passwd.c_str(), -1, SQLITE_STATIC);
 
-    // 회원가입 결과를 클라이언트에 전송
+        if (sqlite3_step(stmt) == SQLITE_DONE) {
+            cout << "New user registered: " << id << endl;
+            isRegisterUser = true;
+        }
+        else {
+            cerr << "SQL execution failed: " << sqlite3_errmsg(db) << endl;
+        }
+    }
+    sqlite3_finalize(stmt);
+    mtx.unlock();
+
+    
     json response;
     if (isRegisterUser) {
         response["status"] = "SUCCESS";
-    } else {
+    }
+    else {
         response["status"] = "FAIL";
     }
 
