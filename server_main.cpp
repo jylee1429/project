@@ -15,6 +15,7 @@
 using namespace std;
 using json = nlohmann::json;
 mutex mtx;
+sqlite3* db;
 
 void clientHandler(int serverSocket);
 void initDB();
@@ -212,4 +213,45 @@ void handleRegisterClient(int clientSocket, const string& memberId, const string
 
     string registerData = response.dump();
     send(clientSocket, registerData.c_str(), registerData.size(), 0);
+}
+
+
+
+// db 초기화 함수
+void initDB() {
+    if (sqlite3_open("veda2.db", &db)) {
+        cerr << "Can't open database: " << sqlite3_errmsg(db) << endl;
+        return;
+    }
+    /*
+    const char* createTableProduct = R"(
+        CREATE TABLE IF NOT EXISTS Products (
+            ProductID INTEGER PRIMARY KEY AUTOINCREMENT,
+            ProductName TEXT NOT NULL,
+            Manufacturer TEXT NOT NULL,
+            Price INTEGER NOT NULL,
+            Stock INTEGER NOT NULL
+        );
+    )";
+    */
+    
+    const char* createTableUser = R"(
+        CREATE TABLE IF NOT EXISTS User (
+            memberID TEXT PRIMARY KEY,
+            memberName TEXT NOT NULL,
+            memberAddress TEXT NOT NULL,
+            memberPhoneNumber INTEGER NOT NULL,
+            id TEXT NOT NULL,
+            passwd TEXT NOT NULL,
+            mileage INT NOT NULL,
+            rating INT NOT NULL
+        );
+    )";
+
+
+    char* errMsg;
+    if (sqlite3_exec(db, createTableUser, 0, 0, &errMsg) != SQLITE_OK) {
+        cerr << "User SQL error: " << errMsg << endl;
+        sqlite3_free(errMsg);
+    }
 }
