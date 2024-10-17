@@ -219,7 +219,7 @@ void handleRegisterClient(int clientSocket, const string& memberId, const string
 
 // db 초기화 함수
 void initDB() {
-    if (sqlite3_open("veda2.db", &db)) {
+    if (sqlite3_open("veda.db", &db)) {
         cerr << "Can't open database: " << sqlite3_errmsg(db) << endl;
         return;
     }
