@@ -9,13 +9,15 @@ using namespace std;
 
 class Admin {
 private:
-    int adminID;
-    int adminPW;
+    string adminID;
+    string adminPW;
     sqlite3* db;
 
 public:
     Admin(int id, int pw);
-    //void initDB();
+    void initDB();
+    string getAdminId();
+    string getAdminPw();
     void addProduct(const string& productName, const string& manufacturer, int price, int stock);
     void listProducts() const;
     void deleteProduct(int productID);
