@@ -1,15 +1,12 @@
 #include "admin.h"
 #include <iostream>
 
-Admin::Admin(int id, int pw) : adminID(id), adminPW(pw), db(nullptr) {}
-
-/*
 void Admin::initDB() {
     if (sqlite3_open("veda.db", &db)) {
         cerr << "Can't open database: " << sqlite3_errmsg(db) << endl;
         return;
     }
-
+    /*
     const char* createTableProduct = R"(
         CREATE TABLE IF NOT EXISTS Products (
             ProductID INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -18,7 +15,7 @@ void Admin::initDB() {
             Price INTEGER NOT NULL,
             Stock INTEGER NOT NULL
         );
-    )";
+    )";*/
     const char* createTableUser = R"(
         CREATE TABLE IF NOT EXISTS User (
             userID TEXT PRIMARY KEY,
@@ -42,7 +39,17 @@ void Admin::initDB() {
         sqlite3_free(errMsg);
     }
 }
-*/
+
+Admin::Admin(string id, string pw) : adminID(id), adminPW(pw), db(nullptr) {
+    initDB();
+}
+string Admin::getAdminId() {
+    return adminID;
+}
+string Admin::getAdminPw() {
+    return adminPW;
+}
+
 void Admin::addProduct(const string& productName, const string& manufacturer, int price, int stock) {
     string insertSQL = "INSERT INTO Products (ProductName, Manufacturer, Price, Stock) VALUES (?, ?, ?, ?);";
     sqlite3_stmt* stmt;
