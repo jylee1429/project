@@ -7,6 +7,7 @@
 #include <thread>
 #include <mutex>
 #include <sqlite3.h>
+#include "admin.h"
 
 
 #define QUEUE_SIZE 50
@@ -18,12 +19,11 @@ mutex mtx;
 sqlite3* db;
 
 void clientHandler(int serverSocket);
-void initDB();
 void handleLogInUser(int clientSocket, const string& id, const string& passwd);
 void handleRegisterClient(int clientSocket, const string& memberId, const string& memberName, const string& memberAddress, const string& memberPhoneNumber, const string& id, const string& passwd);
 
 int main(int argc, char* argv[]) {
-    initDB();  // 데이터베이스 초기화
+    Admin admin(1234, 5678);  //admin id=1234, passwd=5678으로 지정하고 시작
     
     int serverSocket;
     struct sockaddr_in serverAddr, clientAddr;
@@ -130,37 +130,48 @@ void clientHandler(int clientSocket) {
     }
 }
 // 로그인 처리 함수
-void handleLogInUser(int clientSocket, const string& id, const string& passwd) {
+void handleLogInUser(int clientSocket, const string& id, const string& passwd, Admin& admin) {
     bool isExistUser = false;
 
-    
-    mtx.lock();
-    string loginSQL = "SELECT COUNT(*) FROM User WHERE id = ? AND passwd = ?;";
-    sqlite3_stmt* stmt;
+    if (id == admin.getAdminId() && password == admin.getAdminPw()) {
+        admin.listMember();  //test용으로 하나만. 관리자의 회원 목록 출력
+        string response = "Login successful! Admin access granted.";
+        send(client_sock, response.c_str(), response.size(), 0);
+    }
+    else {
+        if (sqlite3_open("veda.db", &db)) {
+            cerr << "Can't open database: " << sqlite3_errmsg(db) << endl;
+            return;
+        }
 
-    if (sqlite3_prepare_v2(db, loginSQL.c_str(), -1, &stmt, 0) == SQLITE_OK) {
-       
-        sqlite3_bind_text(stmt, 1, id.c_str(), -1, SQLITE_STATIC);
-        sqlite3_bind_text(stmt, 2, passwd.c_str(), -1, SQLITE_STATIC);
+        mtx.lock();
 
-        if (sqlite3_step(stmt) == SQLITE_ROW) {
-            int count = sqlite3_column_int(stmt, 0);
-            if (count > 0) {
-                isExistUser = true;
+        string loginSQL = "SELECT COUNT(*) FROM User WHERE id = ? AND passwd = ?;";
+        sqlite3_stmt* stmt;
+
+        if (sqlite3_prepare_v2(db, loginSQL.c_str(), -1, &stmt, 0) == SQLITE_OK) {
+
+            sqlite3_bind_text(stmt, 1, id.c_str(), -1, SQLITE_STATIC);
+            sqlite3_bind_text(stmt, 2, passwd.c_str(), -1, SQLITE_STATIC);
+
+            if (sqlite3_step(stmt) == SQLITE_ROW) {
+                int count = sqlite3_column_int(stmt, 0);
+                if (count > 0) {
+                    isExistUser = true;
+                }
+            }
+            else {
+                cerr << "SQL execution failed: " << sqlite3_errmsg(db) << endl;
             }
         }
         else {
-            cerr << "SQL execution failed: " << sqlite3_errmsg(db) << endl;
+            cerr << "SQL preparation failed: " << sqlite3_errmsg(db) << endl;
         }
-    }
-    else {
-        cerr << "SQL preparation failed: " << sqlite3_errmsg(db) << endl;
+
+        sqlite3_finalize(stmt);
+        mtx.unlock();
     }
 
-    sqlite3_finalize(stmt);
-    mtx.unlock();
-
-    
     json response;
     if (isExistUser) {
         response["status"] = "SUCCESS";
@@ -179,7 +190,10 @@ void handleLogInUser(int clientSocket, const string& id, const string& passwd) {
 void handleRegisterClient(int clientSocket, const string& memberId, const string& memberName, const string& memberAddress, const string& memberPhoneNumber, const string& id, const string& passwd) {
     bool isRegisterUser = false;
 
-    
+    if (sqlite3_open("veda.db", &db)) {
+        cerr << "Can't open database: " << sqlite3_errmsg(db) << endl;
+        return;
+    }
     mtx.lock();
     string insertSQL = "INSERT INTO User (memberId, memberName, memberAddress, memberPhoneNumber, id, passwd, mileage, rating) VALUES (?, ?, ?, ?, ?, ?, 0, 1);";  // mileage = 0, rating = bronze(1)
     sqlite3_stmt* stmt;
@@ -215,43 +229,3 @@ void handleRegisterClient(int clientSocket, const string& memberId, const string
     send(clientSocket, registerData.c_str(), registerData.size(), 0);
 }
 
-
-
-// db 초기화 함수
-void initDB() {
-    if (sqlite3_open("veda.db", &db)) {
-        cerr << "Can't open database: " << sqlite3_errmsg(db) << endl;
-        return;
-    }
-    /*
-    const char* createTableProduct = R"(
-        CREATE TABLE IF NOT EXISTS Products (
-            ProductID INTEGER PRIMARY KEY AUTOINCREMENT,
-            ProductName TEXT NOT NULL,
-            Manufacturer TEXT NOT NULL,
-            Price INTEGER NOT NULL,
-            Stock INTEGER NOT NULL
-        );
-    )";
-    */
-    
-    const char* createTableUser = R"(
-        CREATE TABLE IF NOT EXISTS User (
-            memberID TEXT PRIMARY KEY,
-            memberName TEXT NOT NULL,
-            memberAddress TEXT NOT NULL,
-            memberPhoneNumber INTEGER NOT NULL,
-            id TEXT NOT NULL,
-            passwd TEXT NOT NULL,
-            mileage INT NOT NULL,
-            rating INT NOT NULL
-        );
-    )";
-
-
-    char* errMsg;
-    if (sqlite3_exec(db, createTableUser, 0, 0, &errMsg) != SQLITE_OK) {
-        cerr << "User SQL error: " << errMsg << endl;
-        sqlite3_free(errMsg);
-    }
-}
